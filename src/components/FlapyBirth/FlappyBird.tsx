@@ -113,12 +113,7 @@ export default function FlappyBird() {
 
   const checkCollision = useCallback(
     (bird: Bird, pipes: Pipe[]): boolean => {
-      // Check ground and ceiling collision
-      if (bird.y + BIRD_SIZE >= canvasSize.height || bird.y <= 0) {
-        return true;
-      }
-
-      // Check pipe collision
+      if (bird.y + BIRD_SIZE >= canvasSize.height || bird.y <= 0) return true;
       for (const pipe of pipes) {
         if (bird.x + BIRD_SIZE > pipe.x && bird.x < pipe.x + PIPE_WIDTH) {
           if (
@@ -129,7 +124,6 @@ export default function FlappyBird() {
           }
         }
       }
-
       return false;
     },
     [canvasSize.height]
@@ -142,10 +136,7 @@ export default function FlappyBird() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    // Clear canvas
     ctx.clearRect(0, 0, canvasSize.width, canvasSize.height);
-
-    // Draw animated background with clouds
     const gradient = ctx.createLinearGradient(0, 0, 0, canvasSize.height);
     gradient.addColorStop(0, "#87CEEB");
     gradient.addColorStop(0.7, "#98D8E8");
@@ -153,10 +144,9 @@ export default function FlappyBird() {
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, canvasSize.width, canvasSize.height);
 
-    // Draw animated clouds
     const cloudOffset =
       (frameCountRef.current * 0.5) % (canvasSize.width + 100);
-    ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
+    ctx.fillStyle = "rgba(255,255,255,0.8)";
     ctx.beginPath();
     ctx.arc(cloudOffset - 50, 80, 30, 0, Math.PI * 2);
     ctx.arc(cloudOffset - 30, 80, 35, 0, Math.PI * 2);
@@ -171,12 +161,9 @@ export default function FlappyBird() {
 
     if (gameState === "playing") {
       const bird = birdRef.current;
-
-      // Update bird
       bird.velocity += GRAVITY;
       bird.y += bird.velocity;
 
-      // Generate pipes
       frameCountRef.current++;
       if (frameCountRef.current % PIPE_FREQUENCY === 0) {
         const minHeight = 50;
@@ -190,29 +177,33 @@ export default function FlappyBird() {
         });
       }
 
-      // Update particles
-      particlesRef.current = particlesRef.current.filter((particle) => {
-        particle.x += particle.vx;
-        particle.y += particle.vy;
-        particle.vy += 0.3; // gravity for particles
-        particle.life--;
-        return particle.life > 0;
+      particlesRef.current = particlesRef.current.filter((p) => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.3;
+        p.life--;
+        return p.life > 0;
       });
 
-      // Update pipes
       pipesRef.current = pipesRef.current.filter((pipe) => {
         pipe.x -= PIPE_SPEED;
 
-        // Check if bird passed the pipe
+        // ✅ Khi vượt qua ống => cộng điểm + lưu localStorage
         if (!pipe.passed && pipe.x + PIPE_WIDTH < bird.x) {
           pipe.passed = true;
-          setScore((s) => s + 1);
+          setScore((s) => {
+            const newScore = s + 1;
+            // Cộng điểm vào localStorage
+            const storedPoints = parseInt(localStorage.getItem("userPoints") || "0", 10);
+            const newTotal = storedPoints + 1;
+            localStorage.setItem("userPoints", newTotal.toString());
+            return newScore;
+          });
         }
 
         return pipe.x > -PIPE_WIDTH;
       });
 
-      // Check collision
       if (checkCollision(bird, pipesRef.current)) {
         createParticles(bird.x, bird.y);
         setGameState("gameover");
@@ -220,72 +211,42 @@ export default function FlappyBird() {
       }
     }
 
-    // Draw pipes
     pipesRef.current.forEach((pipe) => {
-      // Top pipe
       ctx.fillStyle = "#5CB85C";
       ctx.fillRect(pipe.x, 0, PIPE_WIDTH, pipe.topHeight);
       ctx.strokeStyle = "#4A934A";
       ctx.lineWidth = 3;
       ctx.strokeRect(pipe.x, 0, PIPE_WIDTH, pipe.topHeight);
 
-      // Pipe cap (top)
-      ctx.fillStyle = "#5CB85C";
       ctx.fillRect(pipe.x - 5, pipe.topHeight - 20, PIPE_WIDTH + 10, 20);
-      ctx.strokeStyle = "#4A934A";
       ctx.strokeRect(pipe.x - 5, pipe.topHeight - 20, PIPE_WIDTH + 10, 20);
 
-      // Bottom pipe
       const bottomPipeY = pipe.topHeight + pipe.gap;
       ctx.fillStyle = "#5CB85C";
-      ctx.fillRect(
-        pipe.x,
-        bottomPipeY,
-        PIPE_WIDTH,
-        canvasSize.height - bottomPipeY
-      );
+      ctx.fillRect(pipe.x, bottomPipeY, PIPE_WIDTH, canvasSize.height - bottomPipeY);
       ctx.strokeStyle = "#4A934A";
-      ctx.strokeRect(
-        pipe.x,
-        bottomPipeY,
-        PIPE_WIDTH,
-        canvasSize.height - bottomPipeY
-      );
+      ctx.strokeRect(pipe.x, bottomPipeY, PIPE_WIDTH, canvasSize.height - bottomPipeY);
 
-      // Pipe cap (bottom)
-      ctx.fillStyle = "#5CB85C";
       ctx.fillRect(pipe.x - 5, bottomPipeY, PIPE_WIDTH + 10, 20);
-      ctx.strokeStyle = "#4A934A";
       ctx.strokeRect(pipe.x - 5, bottomPipeY, PIPE_WIDTH + 10, 20);
     });
 
-    // Draw particles
-    particlesRef.current.forEach((particle) => {
+    particlesRef.current.forEach((p) => {
       ctx.save();
-      ctx.globalAlpha = particle.life / 30;
+      ctx.globalAlpha = p.life / 30;
       ctx.fillStyle = "#FF6B6B";
       ctx.beginPath();
-      ctx.arc(particle.x, particle.y, 3, 0, Math.PI * 2);
+      ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
       ctx.fill();
       ctx.restore();
     });
 
-    // Draw bird
     const bird = birdRef.current;
-
-    // Bird shadow
-    ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
+    ctx.fillStyle = "rgba(0,0,0,0.2)";
     ctx.beginPath();
-    ctx.arc(
-      bird.x + BIRD_SIZE / 2 + 2,
-      bird.y + BIRD_SIZE / 2 + 2,
-      BIRD_SIZE / 2,
-      0,
-      Math.PI * 2
-    );
+    ctx.arc(bird.x + BIRD_SIZE / 2 + 2, bird.y + BIRD_SIZE / 2 + 2, BIRD_SIZE / 2, 0, Math.PI * 2);
     ctx.fill();
 
-    // Bird body with gradient
     const birdGradient = ctx.createRadialGradient(
       bird.x + BIRD_SIZE / 2 - 5,
       bird.y + BIRD_SIZE / 2 - 5,
@@ -298,44 +259,21 @@ export default function FlappyBird() {
     birdGradient.addColorStop(1, "#FFD700");
     ctx.fillStyle = birdGradient;
     ctx.beginPath();
-    ctx.arc(
-      bird.x + BIRD_SIZE / 2,
-      bird.y + BIRD_SIZE / 2,
-      BIRD_SIZE / 2,
-      0,
-      Math.PI * 2
-    );
+    ctx.arc(bird.x + BIRD_SIZE / 2, bird.y + BIRD_SIZE / 2, BIRD_SIZE / 2, 0, Math.PI * 2);
     ctx.fill();
-
-    // Bird outline
     ctx.strokeStyle = "#FFA500";
     ctx.lineWidth = 2;
     ctx.stroke();
 
-    // Bird eye
     ctx.fillStyle = "white";
     ctx.beginPath();
-    ctx.arc(
-      bird.x + BIRD_SIZE / 2 + 5,
-      bird.y + BIRD_SIZE / 2 - 3,
-      5,
-      0,
-      Math.PI * 2
-    );
+    ctx.arc(bird.x + BIRD_SIZE / 2 + 5, bird.y + BIRD_SIZE / 2 - 3, 5, 0, Math.PI * 2);
     ctx.fill();
-
     ctx.fillStyle = "black";
     ctx.beginPath();
-    ctx.arc(
-      bird.x + BIRD_SIZE / 2 + 7,
-      bird.y + BIRD_SIZE / 2 - 3,
-      3,
-      0,
-      Math.PI * 2
-    );
+    ctx.arc(bird.x + BIRD_SIZE / 2 + 7, bird.y + BIRD_SIZE / 2 - 3, 3, 0, Math.PI * 2);
     ctx.fill();
 
-    // Bird beak
     ctx.fillStyle = "#FF6347";
     ctx.beginPath();
     ctx.moveTo(bird.x + BIRD_SIZE, bird.y + BIRD_SIZE / 2);
@@ -344,7 +282,6 @@ export default function FlappyBird() {
     ctx.closePath();
     ctx.fill();
 
-    // Draw score with enhanced styling
     ctx.fillStyle = "white";
     ctx.strokeStyle = "#2C3E50";
     ctx.lineWidth = 4;
@@ -359,13 +296,10 @@ export default function FlappyBird() {
   useEffect(() => {
     gameLoop();
     return () => {
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current);
-      }
+      if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
     };
   }, [gameLoop]);
 
-  // Touch controls for mobile
   useEffect(() => {
     const handleTouchStart = (e: TouchEvent) => {
       e.preventDefault();
@@ -373,9 +307,7 @@ export default function FlappyBird() {
     };
 
     if (isMobile) {
-      window.addEventListener("touchstart", handleTouchStart, {
-        passive: false,
-      });
+      window.addEventListener("touchstart", handleTouchStart, { passive: false });
       return () => window.removeEventListener("touchstart", handleTouchStart);
     }
   }, [jump, isMobile]);
@@ -387,7 +319,6 @@ export default function FlappyBird() {
         jump();
       }
     };
-
     window.addEventListener("keydown", handleKeyPress);
     return () => window.removeEventListener("keydown", handleKeyPress);
   }, [jump]);

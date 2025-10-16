@@ -33,11 +33,15 @@ export default function Header() {
         <button className="px-4 py-2 bg-yellow-400 text-white rounded-lg shadow hover:bg-yellow-500 transition">
           GAME PASS
         </button>
-        <button className="px-4 py-2 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 transition">
-          Login
+        <button className="px-4 py-2 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 transition"
+          onClick={() => {
+            window.location.href = "/wallet";
+          }}
+        >
+          Ví
         </button>
         <button className="px-4 py-2 bg-green-400 text-white rounded-lg shadow hover:bg-green-500 transition">
-          Register
+          Login
         </button>
       </div>
     </header>

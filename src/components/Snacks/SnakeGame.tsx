@@ -73,6 +73,13 @@ export default function SnakeGame() {
 
     return () => clearInterval(interval);
   }, [direction, food, isGameOver, isRunning]);
+  useEffect(() => {
+  if (isGameOver) {
+    const current = parseInt(localStorage.getItem("userPoints") || "0");
+    const newTotal = current + score;
+    localStorage.setItem("userPoints", newTotal.toString());
+  }
+}, [isGameOver]);
 
   // Handle key press
   useEffect(() => {
