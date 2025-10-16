@@ -2,29 +2,42 @@
 
 import React from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function Header() {
   return (
-    <header className="bg-gray-900 text-white flex items-center justify-between px-6 py-4">
-      {/* Logo / Tên */}
-      <Link href="/" className="text-2xl font-bold hover:text-gray-300">
-        MiniApp Hub
-      </Link>
-
-      {/* Menu */}
-      <nav className="space-x-4">
-        <Link href="/" className="hover:text-gray-300">
-          Trang chủ
-        </Link>
-        <Link href="/games" className="hover:text-gray-300">
+    <header className="flex flex-col md:flex-row items-center justify-between px-6 py-4 bg-white shadow-md rounded-b-lg">
+      <div
+        className="text-2xl font-bold text-red-500 mb-2 md:mb-0 cursor-pointer"
+        onClick={() => {
+          window.location.href = "/";
+        }}
+      >
+        LVS GAMES
+      </div>
+      <div className="flex flex-wrap items-center gap-2 md:gap-4">
+        <input
+          type="text"
+          placeholder="Search a game"
+          className="px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-red-300 focus:outline-none transition w-full md:w-auto"
+        />
+        <button className="px-4 py-2 bg-red-500 text-white rounded-lg shadow hover:bg-red-600 transition">
           Games
-        </Link>
-      </nav>
-
-      {/* Account */}
-      <div>
-        <button className="bg-blue-600 px-4 py-1 rounded hover:bg-blue-700 transition">
+        </button>
+        <button className="px-4 py-2 bg-orange-400 text-white rounded-lg shadow hover:bg-orange-500 transition">
+          Hot
+        </button>
+        <button className="px-4 py-2 bg-green-500 text-white rounded-lg shadow hover:bg-green-600 transition">
+          Multiplayer
+        </button>
+        <button className="px-4 py-2 bg-yellow-400 text-white rounded-lg shadow hover:bg-yellow-500 transition">
+          GAME PASS
+        </button>
+        <button className="px-4 py-2 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 transition">
           Login
+        </button>
+        <button className="px-4 py-2 bg-green-400 text-white rounded-lg shadow hover:bg-green-500 transition">
+          Register
         </button>
       </div>
     </header>
