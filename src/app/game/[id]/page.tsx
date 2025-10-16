@@ -36,84 +36,80 @@ export default function GamePage() {
             ) : currentGame?.name === "Snacks" ? (
               <SnakeGame />
             ) : currentGame?.name === "Angry Birds" ? (
-                <AngryBirdReact />
-            ) :
-            (
+              <AngryBirdReact />
+            ) : (
               <img
                 src={currentGame?.logo}
                 alt={currentGame?.name}
                 className="w-full max-w-lg rounded-xl border border-gray-200"
               />
             )}
-
-            <button
-              onClick={() => router.push("/")}
-              className="mt-5 px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm"
-            >
-              ← Quay lại trang chủ
-            </button>
           </div>
         </div>
 
         {/* RIGHT: Similar games */}
-        <div className="bg-white rounded-2xl shadow-md p-5">
-          <h2 className="text-lg font-semibold mb-3 text-gray-800">
-            🕹 Game tương tự
-          </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-2 gap-3">
-            {similarGames.map((game) => (
-              <GameCard
-                key={game.id}
-                id={game.id}
-                name={game.name}
-                logo={game.logo}
-                rating={4}
-                plays={500}
-              />
-            ))}
+        {currentGame?.name !== "Angry Birds" && (
+          <div className="bg-white rounded-2xl shadow-md p-5">
+            <h2 className="text-lg font-semibold mb-3 text-gray-800">
+              🕹 Game tương tự
+            </h2>
+            <div className="grid grid-cols-2 sm:grid-cols-2 gap-3">
+              {similarGames.map((game) => (
+                <GameCard
+                  key={game.id}
+                  id={game.id}
+                  name={game.name}
+                  logo={game.logo}
+                  rating={4}
+                  plays={500}
+                />
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* REVIEW SECTION */}
-      <div className="max-w-6xl mx-auto px-4 pb-10">
-        <div className="bg-white rounded-2xl shadow-md p-5 mt-6">
-          <h2 className="text-lg font-semibold mb-4 text-gray-800">
-            💬 Đánh giá của người chơi
-          </h2>
-          <div className="space-y-4">
-            {[
-              {
-                user: "Người chơi 1",
-                comment: "Game rất thú vị, khó nhưng gây nghiện!",
-              },
-              {
-                user: "Người chơi 2",
-                comment: "Đồ họa đơn giản nhưng gameplay hấp dẫn.",
-              },
-              {
-                user: "Người chơi 3",
-                comment: "Thích hợp để giải trí nhanh sau giờ học.",
-              },
-            ].map((r, i) => (
-              <div
-                key={i}
-                className="flex items-start gap-3 border-b border-gray-100 pb-3"
-              >
-                <img
-                  src={`https://api.dicebear.com/7.x/personas/svg?seed=${r.user}`}
-                  alt={r.user}
-                  className="w-10 h-10 rounded-full"
-                />
-                <div>
-                  <p className="font-medium text-gray-800">{r.user}</p>
-                  <p className="text-gray-600 text-sm">{r.comment}</p>
+      {currentGame?.name !== "Angry Birds" && (
+        <div className="max-w-6xl mx-auto px-4 pb-10">
+          <div className="bg-white rounded-2xl shadow-md p-5 mt-6">
+            <h2 className="text-lg font-semibold mb-4 text-gray-800">
+              💬 Đánh giá của người chơi
+            </h2>
+            <div className="space-y-4">
+              {[
+                {
+                  user: "Người chơi 1",
+                  comment: "Game rất thú vị, khó nhưng gây nghiện!",
+                },
+                {
+                  user: "Người chơi 2",
+                  comment: "Đồ họa đơn giản nhưng gameplay hấp dẫn.",
+                },
+                {
+                  user: "Người chơi 3",
+                  comment: "Thích hợp để giải trí nhanh sau giờ học.",
+                },
+              ].map((r, i) => (
+                <div
+                  key={i}
+                  className="flex items-start gap-3 border-b border-gray-100 pb-3"
+                >
+                  <img
+                    src={`https://api.dicebear.com/7.x/personas/svg?seed=${r.user}`}
+                    alt={r.user}
+                    className="w-10 h-10 rounded-full"
+                  />
+                  <div>
+                    <p className="font-medium text-gray-800">{r.user}</p>
+                    <p className="text-gray-600 text-sm">{r.comment}</p>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
