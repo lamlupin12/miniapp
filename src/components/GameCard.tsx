@@ -17,7 +17,7 @@ const GameCard: React.FC<GameCardProps> = ({ id, name, logo, rating, plays }) =>
   return (
     <div
       className="bg-white rounded-lg shadow-lg cursor-pointer hover:scale-105 transition-transform"
-      onClick={() => router.push(`/games/${id}`)}
+      onClick={() => router.push(`/game/${id}`)}
     >
       <img src={logo} alt={name} className="w-full h-40 object-cover rounded-t-lg" />
       <div className="p-4">
